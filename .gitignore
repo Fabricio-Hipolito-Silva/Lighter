@@ -6,3 +6,4 @@ lib/TFT_eSPI/*
 !lib/TFT_eSPI/User_Setup.h
 teste.txt
 include/secret.h
+src/secret.cpp
