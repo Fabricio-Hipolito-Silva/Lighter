@@ -13,11 +13,11 @@ int getMenuSize(){
     return 4;
 };
 int selectedIndex = 0;
-const char* getMenuItem(int index, bool ColorMode){
+const char* getMenuItem(int index, bool ColorMode, bool lightState){
     if(ColorMode){
         switch (index)
         {
-        case 0: return "Ligado";
+        case 0: return lightState ? "Ligado" : "Desligado";
         case 1: return "Modo: Colorido";
         case 2: return "Mudar Cor";
         case 3: return "Brilho";
@@ -26,7 +26,7 @@ const char* getMenuItem(int index, bool ColorMode){
     } else{
         switch (index)
         {
-        case 0: return "Ligado";
+        case 0: return lightState ? "Ligado" : "Desligado";
         case 1: return "Modo: Branco";
         case 2: return "Brilho";
         case 3: return "Temperatura";
@@ -46,7 +46,7 @@ void drawMenu() {
             tft.setTextColor(TFT_WHITE, TFT_BLACK);
         }
         tft.drawString(
-            getMenuItem(i, ColorMode),
+            getMenuItem(i, ColorMode, lightState),
             5,
             startY + (i * itemHeight),
             2

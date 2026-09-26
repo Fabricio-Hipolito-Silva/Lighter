@@ -3,6 +3,7 @@
 #include <TFT_eSPI.h>
 #include <SPI.h>
 #include <math.h>
+#include "navMenu.h"
 
 TFT_eSPI tft = TFT_eSPI();
 #define CX 55
@@ -18,13 +19,12 @@ TFT_eSPI tft = TFT_eSPI();
 #define ENC_BUTTON 15
 
 int lastA = HIGH;
-bool editingHue = true;
-// ==============================
-// HSV
-// ==============================
-int hue = 0;
-int saturation = 1000;
-int brightness = 1000;
+enum ColorEdit {
+    EDIT_HUE,
+    EDIT_SATURATION,
+    EDIT_BRIGHTNESS
+};
+ColorEdit editign = EDIT_HUE;
 // ==============================
 // HSV -> RGB565
 // ==============================
@@ -115,9 +115,9 @@ void drawColorWheel()
 void drawCursor()
 {
     float distance =
-        (saturation / 1000.0f) * RADIUS;
+        (s / 1000.0f) * RADIUS;
     float angle =
-        hue * PI / 180.0f;
+        h * PI / 180.0f;
     int cursorX =
         CX + cos(angle) * distance;
     int cursorY =
@@ -159,7 +159,7 @@ void drawInterface()
     // ==========================
     // HUE
     // ==========================
-    if (editingHue)
+    if (editign == EDIT_HUE)
         tft.setTextColor(TFT_WHITE);
     else
         tft.setTextColor(TFT_DARKGREY);
@@ -169,7 +169,7 @@ void drawInterface()
         115,
         35
     );
-    if (editingHue)
+    if (editign == EDIT_HUE)
         tft.drawCircle(
             145,
             39,
@@ -185,7 +185,7 @@ void drawInterface()
         );
     // Valor do HUE
     tft.drawNumber(
-        hue,
+        h,
         115,
         48
     );
@@ -197,7 +197,7 @@ void drawInterface()
     // ==========================
     // SAT
     // ==========================
-    if (!editingHue)
+    if (editign == EDIT_SATURATION)
         tft.setTextColor(TFT_WHITE);
     else
         tft.setTextColor(TFT_DARKGREY);
@@ -206,7 +206,7 @@ void drawInterface()
         115,
         65
     );
-    if (!editingHue)
+    if (editign == EDIT_SATURATION)
         tft.drawCircle(
             145,
             69,
@@ -222,21 +222,26 @@ void drawInterface()
         );
     // Valor SAT
     tft.drawNumber(
-        saturation,
+        s,
         115,
         78
     );
     // ==========================
     // BRILHO
     // ==========================
-    tft.setTextColor(TFT_WHITE);
+    if (editign == EDIT_BRIGHTNESS)
+    {
+        tft.setTextColor(TFT_WHITE);
+    }else{
+        tft.setTextColor(TFT_DARKGREY);
+    }
     tft.drawString(
         "BRILHO",
         115,
         96
     );
     tft.drawNumber(
-        brightness,
+        v,
         115,
         109
     );
@@ -252,36 +257,40 @@ void readEncoder()
         if (currentA == LOW) {
             int currentB =
                 digitalRead(ENC_B);
-            if (currentB != currentA) {
-                // ==================
-                // SENTIDO HORÁRIO
-                // ==================
-                if (editingHue) {
-                    hue += 20;
-                    if (hue >= 360)
-                        hue = 0;
-                }
-                else {
-                    saturation += 200;
-                    if (saturation > 1000)
-                        saturation = 1000;
-                }
+         if (currentB != currentA) {
+            if (editign == EDIT_HUE) {
+                h += 20;
+                if (h >= 360)
+                    h = 0;
             }
-            else {
-                // ==================
-                // SENTIDO ANTI-HORÁRIO
-                // ==================
-                if (editingHue) {
-                    hue -= 20;
-                    if (hue < 0)
-                        hue = 355;
-                }
-                else {
-                    saturation -= 200;
-                    if (saturation < 0)
-                        saturation = 0;
-                }
+            else if (editign == EDIT_SATURATION) {
+                s += 200;
+                if (s > 1000)
+                    s = 1000;
             }
+            else if (editign == EDIT_BRIGHTNESS) {
+                v += 100;
+                if (v > 1000)
+                v = 1000;
+            }
+}
+    else {
+        if (editign == EDIT_HUE) {
+            h -= 20;
+            if (h < 0)
+                h = 340;
+        }
+        else if (editign == EDIT_SATURATION) {
+            s -= 200;
+            if (s < 0)
+                s = 0;
+        }
+        else if (editign == EDIT_BRIGHTNESS) {
+            v -= 100;
+            if (v < 0)
+                v = 0;
+        }
+    }
 
             drawInterface();
         }
@@ -295,30 +304,37 @@ void readEncoder()
 // BOTÃO
 // ==============================
 
-void readButton()
+bool readButton()
 {
     static bool lastButton = HIGH;
-    bool currentButton =
-        digitalRead(ENC_BUTTON);
-    if (lastButton == HIGH &&
-        currentButton == LOW) {
-        editingHue = !editingHue;
+    bool currentButton = digitalRead(ENC_BUTTON);
+    if (lastButton == HIGH && currentButton == LOW) {
+        if (editign == EDIT_HUE) {
+            editign = EDIT_SATURATION;
+        }
+        else if (editign == EDIT_SATURATION) {
+            editign = EDIT_BRIGHTNESS;
+        }
+        else if (editign == EDIT_BRIGHTNESS) {
+            editign = EDIT_HUE;
+            return true;
+        }
         drawInterface();
         delay(150);
     }
+
     lastButton = currentButton;
+    return false;
 }
 void telaCor()
 {
     drawInterface();
-
     while (true)
     {
         readEncoder();
-        readButton();
+        if(readButton()) break;;
     }
 }
-
 void iniciarTelaCor()
 {
     tft.init();

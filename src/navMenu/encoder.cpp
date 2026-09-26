@@ -38,19 +38,26 @@ void handleButton(){
     {
     case POWER:
     lightState = !lightState;
-
-    Serial.print("Luz: ");
-    Serial.println(lightState ? "LIGADA" : "DESLIGADA");
-
     sendLightState();
-
+    drawMenu();
     delay(200); // debounce simples
     break;
+
     case MODE:
-    ColorMode = true;
+    ColorMode = !ColorMode;
+    if(ColorMode){
+        work_mode = "colour";
+    }else {
+        work_mode = "white";
+    }
+    sendLightState();
+    drawMenu();
+    delay(200);
     break;
     case COLOR:
     telaCor();
+    sendLightState();
+    drawMenu();
     break;
     }
 }

@@ -92,6 +92,9 @@
 // #define TFT_HEIGHT 320 // ST7789 240 x 320
 // #define TFT_HEIGHT 240 // GC9A01 240 x 240
 
+#define TFT_RGB_ORDER TFT_RGB  // Colour order Red-Green-Blue
+// #define TFT_RGB_ORDER TFT_BGR  // Colour order Blue-Green-Red
+
 // For ST7735 ONLY, define the type of display, originally this was based on the
 // colour of the tab on the screen protector film but this is not always true, so try
 // out the different options below if the screen does not display graphics correctly,

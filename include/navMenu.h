@@ -4,6 +4,10 @@
 extern int selectedIndex;
 extern bool ColorMode;
 extern bool lightState;
+extern String work_mode;
+extern int brightness_value_v2;
+extern int temperature_value_v2;
+extern int h; extern int s; extern int v;
 enum MenuItem {
     POWER,
     MODE,
