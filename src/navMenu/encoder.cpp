@@ -10,8 +10,58 @@
 #define ENC_B 18
 bool lastButtonState = HIGH;
 int lastEncoderA = HIGH;
+void changeBright_Temp(bool isBright)
+{
+    static int lastReadA = HIGH;
+    int readA = digitalRead(ENC_A);
+    if (readA != lastReadA)
+    {
+        if (digitalRead(ENC_B) != readA)
+        {
+            if (isBright)
+            {
+                brightness_value_v2 += 20;
+                if (brightness_value_v2 > 1000)
+                    brightness_value_v2 = 1000;
+            }
+            else
+            {
+                temperature_value_v2 += 20;
+                if (temperature_value_v2 > 1000)
+                    temperature_value_v2 = 1000;
+            }
+        }
+        else
+        {
+            if (isBright)
+            {
+                brightness_value_v2 -= 20;
+
+                if (brightness_value_v2 < 0)
+                    brightness_value_v2 = 0;
+            }
+            else
+            {
+                temperature_value_v2 -= 20;
+
+                if (temperature_value_v2 < 0)
+                    temperature_value_v2 = 0;
+            }
+        }
+        drawMenu();
+    }
+
+    lastReadA = readA;
+}
 void handleEncoder(){
-int currentEncoderA = digitalRead(ENC_A);
+    if (editingValue){
+        if (getSelectedItem() == BRIGHTNESS)
+            changeBright_Temp(true);
+        if (getSelectedItem() == TEMPERATURE)
+            changeBright_Temp(false);
+        return;
+    }
+    int currentEncoderA = digitalRead(ENC_A);
     if (currentEncoderA != lastEncoderA) {
         if (digitalRead(ENC_B) != currentEncoderA) {
             selectedIndex++;
@@ -34,6 +84,7 @@ int currentEncoderA = digitalRead(ENC_A);
 void handleButton(){
     bool currentButtonState = digitalRead(BUTTON_PIN);
     if (currentButtonState == LOW && lastButtonState == HIGH) {
+    
     switch (getSelectedItem())
     {
     case POWER:
@@ -54,8 +105,21 @@ void handleButton(){
     drawMenu();
     delay(200);
     break;
+
     case COLOR:
     telaCor();
+    sendLightState();
+    drawMenu();
+    break;
+
+    case BRIGHTNESS:
+    editingValue = !editingValue;
+    sendLightState();
+    drawMenu();
+    break;
+
+    case TEMPERATURE:
+    editingValue = !editingValue;
     sendLightState();
     drawMenu();
     break;
@@ -63,3 +127,4 @@ void handleButton(){
 }
     lastButtonState = currentButtonState;
 };
+

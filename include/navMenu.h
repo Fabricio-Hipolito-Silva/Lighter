@@ -3,6 +3,7 @@
 #include <TFT_eSPI.h>
 extern int selectedIndex;
 extern bool ColorMode;
+extern bool editingValue;
 extern bool lightState;
 extern String work_mode;
 extern int brightness_value_v2;

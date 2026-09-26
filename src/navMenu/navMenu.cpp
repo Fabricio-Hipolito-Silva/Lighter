@@ -6,6 +6,7 @@
 #include "setup.h"
 #include "navMenu.h"
 bool ColorMode = false;
+bool editingValue = false;
 int getMenuSize(){
     if (ColorMode){
         return 5;
@@ -40,7 +41,7 @@ void drawMenu() {
     int itemHeight = 25;
     int startY = 10;
     for (int i = 0; i < menuSize; i++) {
-        if (i == selectedIndex) {
+        if (i == selectedIndex && !editingValue) {
             tft.setTextColor(TFT_BLACK, TFT_WHITE);
         } else {
             tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -51,7 +52,36 @@ void drawMenu() {
             startY + (i * itemHeight),
             2
         );
+        if (ColorMode && i == BRIGHTNESS || !ColorMode && i == BRIGHTNESS -1){
+            if (editingValue && getSelectedItem() == BRIGHTNESS)
+            {
+                tft.setTextColor(TFT_BLACK, TFT_WHITE);
+            }else{
+                tft.setTextColor(TFT_WHITE, TFT_BLACK);
+            }
+            tft.drawString(
+                String(brightness_value_v2/10)+ "%",
+                110,
+                startY + (i*itemHeight),
+                2
+            );
+        }
+        if (ColorMode && i == TEMPERATURE || !ColorMode && i == TEMPERATURE-1){
+            if (editingValue && getSelectedItem() == TEMPERATURE)
+            {
+                tft.setTextColor(TFT_BLACK, TFT_WHITE);
+            }else{
+                tft.setTextColor(TFT_WHITE, TFT_BLACK);
+            }
+            tft.drawString(
+                String(temperature_value_v2/10)+ "%",
+                110,
+                startY + (i*itemHeight),
+                2
+            );
+        }
     }
+
 }
 MenuItem getSelectedItem(){
     if(ColorMode){
