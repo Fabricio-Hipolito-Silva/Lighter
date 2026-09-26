@@ -4,6 +4,7 @@
 #include <SPI.h>
 #include <math.h>
 #include "navMenu.h"
+#include "setup.h"
 
 TFT_eSPI tft = TFT_eSPI();
 #define CX 55
@@ -340,8 +341,7 @@ void iniciarTelaCor()
     tft.init();
     tft.setRotation(1);
     tft.fillScreen(TFT_BLACK);
-    drawInterface();
-
+    showBootScreen();
     pinMode(ENC_A, INPUT_PULLUP);
     pinMode(ENC_B, INPUT_PULLUP);
     pinMode(ENC_BUTTON, INPUT_PULLUP);

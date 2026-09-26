@@ -5,6 +5,7 @@
 #include "secret.h"
 #include "setup.h"
 #include "navMenu.h"
+#include <LittleFS.h>
 #define BUTTON_PIN 15
 #define ENC_A 19
 #define ENC_B 18
